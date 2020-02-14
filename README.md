@@ -1,4 +1,5 @@
-# Drone Exporter
+# Drone.io CI/CD  Prometheus Exporter
+## Drone.io CI / CDシステムのプロメテウス監視インジケーター
 
 # Install インストール
 ```
