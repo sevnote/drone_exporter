@@ -1,0 +1,4 @@
+vendor
+nohup.put
+./config/config.json
+./bin/config.json

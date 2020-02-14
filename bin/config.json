@@ -1,0 +1,38 @@
+{
+    "development": {
+        "mysql": {
+            "host": "192.168.25.154",
+            "port": 3306,
+            "db": "drone",
+            "username": "root",
+            "password": "Mm123456"
+        },
+        "redis": {
+            "host": "192.168.25.83",
+            "port": 6379,
+            "db": 0
+        },
+        "drone_server": {
+            "host": "http://192.168.16.77",
+            "token": "Bearer JWJuqCm4h9KoTh3SZeeQbHLYD0xdAcZh"
+        }
+    },
+    "production": {
+        "mysql": {
+            "host": "192.168.25.154",
+            "port": 3306,
+            "db": "drone",
+            "username": "root",
+            "password": "Mm123456"
+        },
+        "redis": {
+            "host": "192.168.25.83",
+            "port": 6379,
+            "db": 0
+        },
+        "drone_server": {
+            "host": "http://192.168.16.77",
+            "token": "Bearer JWJuqCm4h9KoTh3SZeeQbHLYD0xdAcZh"
+        }
+    }
+}

@@ -1,0 +1,38 @@
+{
+    "development": {
+        "mysql": {
+            "host": "mysql_server",
+            "port": "mysql_port",
+            "db": "dbname",
+            "username": "username",
+            "password": "password"
+        },
+        "redis": {
+            "host": "redis_server",
+            "port": "redis_port",
+            "db": "redis_db"
+        },
+        "drone_server": {
+            "host": "http://127.0.0.1",
+            "token": "drone_token"
+        }
+    },
+	"production":{
+        "mysql": {
+            "host": "mysql_server",
+            "port": "mysql_port",
+            "db": "dbname",
+            "username": "username",
+            "password": "password"
+        },
+        "redis": {
+            "host": "redis_server",
+            "port": "redis_port",
+            "db": "redis_db"
+        },
+        "drone_server": {
+            "host": "http://127.0.0.1",
+            "token": "drone_token"
+        }
+    }
+}

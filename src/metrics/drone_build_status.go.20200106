@@ -1,0 +1,153 @@
+package metrics
+
+import (
+	"drone_exporter/src/lib"
+	"github.com/pkg/errors"
+	"github.com/prometheus/client_golang/prometheus"
+)
+
+type DroneStatus struct {
+	Server      string
+	PendingDesc *prometheus.Desc
+	ErrorDesc   *prometheus.Desc
+	FailureDesc *prometheus.Desc
+	KilledDesc  *prometheus.Desc
+	RunningDesc *prometheus.Desc
+	SuccessDesc *prometheus.Desc
+}
+
+// Simulate prepare the data
+func (c *DroneStatus) ReallyExpensiveAssessmentOfTheSystemState() (buildStatus map[string]map[string]float64) {
+
+	droneDBConn, err := lib.OpenMysqlDB("192.168.25.154", 3306, "root", "Mm123456", "drone")
+	if err != nil {
+		err = errors.WithStack(err)
+		return
+	}
+	defer droneDBConn.Close()
+
+	buildStatusSql := "SELECT builds.build_status,repos.repo_slug as repo FROM builds INNER JOIN repos ON builds.build_repo_id=repos.repo_id"
+	rows, err := droneDBConn.Query(buildStatusSql)
+	if err != nil {
+		return
+	}
+	buildStatus = make(map[string]map[string]float64)
+	for rows.Next() {
+		var status string
+		var repo string
+		err = rows.Scan(&status, &repo)
+		if _, ok := buildStatus[status]; ok {
+			buildStatus[status][repo] += 1
+		} else {
+			buildStatus[status] = map[string]float64{repo: 1}
+		}
+	}
+
+	//End of Conver,
+	//fmt.Println(buildStatus)
+
+	return
+}
+
+// Describe simply sends the two Descs in the struct to the channel.
+func (c *DroneStatus) Describe(ch chan<- *prometheus.Desc) {
+	ch <- c.PendingDesc
+	ch <- c.ErrorDesc
+	ch <- c.FailureDesc
+	ch <- c.KilledDesc
+	ch <- c.RunningDesc
+	ch <- c.SuccessDesc
+}
+func (c *DroneStatus) Collect(ch chan<- prometheus.Metric) {
+	buildStatus := c.ReallyExpensiveAssessmentOfTheSystemState()
+	for repo, count := range buildStatus["pending"] {
+		ch <- prometheus.MustNewConstMetric(
+			c.PendingDesc,
+			prometheus.GaugeValue,
+			count,
+			repo,
+		)
+	}
+	for repo, count := range buildStatus["error"] {
+		ch <- prometheus.MustNewConstMetric(
+			c.ErrorDesc,
+			prometheus.GaugeValue,
+			count,
+			repo,
+		)
+	}
+	for repo, count := range buildStatus["failure"] {
+		ch <- prometheus.MustNewConstMetric(
+			c.FailureDesc,
+			prometheus.GaugeValue,
+			count,
+			repo,
+		)
+	}
+	for repo, count := range buildStatus["killed"] {
+		ch <- prometheus.MustNewConstMetric(
+			c.KilledDesc,
+			prometheus.GaugeValue,
+			count,
+			repo,
+		)
+	}
+	for repo, count := range buildStatus["running"] {
+		ch <- prometheus.MustNewConstMetric(
+			c.RunningDesc,
+			prometheus.GaugeValue,
+			count,
+			repo,
+		)
+	}
+	for repo, count := range buildStatus["success"] {
+		ch <- prometheus.MustNewConstMetric(
+			c.SuccessDesc,
+			prometheus.GaugeValue,
+			count,
+			repo,
+		)
+	}
+}
+
+func NewMetrics(server string) *DroneStatus {
+	return &DroneStatus{
+		Server: server,
+		PendingDesc: prometheus.NewDesc(
+			"drone_build_pending_total",
+			"Number of Pending Count.",
+			[]string{"repo"},
+			prometheus.Labels{"server": server},
+		),
+		ErrorDesc: prometheus.NewDesc(
+			"drone_build_error_total",
+			"Number of Error Count.",
+			[]string{"repo"},
+			prometheus.Labels{"server": server},
+		),
+		FailureDesc: prometheus.NewDesc(
+			"drone_build_failure_total",
+			"Number of Failure Count.",
+			[]string{"repo"},
+			prometheus.Labels{"server": server},
+		),
+		KilledDesc: prometheus.NewDesc(
+			"drone_build_kill_total",
+			"Number of Killed Count.",
+			[]string{"repo"},
+			prometheus.Labels{"server": server},
+		),
+		RunningDesc: prometheus.NewDesc(
+			"drone_build_running_total",
+			"Number of Running Count.",
+			[]string{"repo"},
+			prometheus.Labels{"server": server},
+		),
+		SuccessDesc: prometheus.NewDesc(
+			"drone_build_success_total",
+			"Number of Success Count.",
+			[]string{"repo"},
+			prometheus.Labels{"server": server},
+		),
+	}
+}
