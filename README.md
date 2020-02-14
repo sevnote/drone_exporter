@@ -14,4 +14,4 @@ bash build.sh
 ```
 import dashboard.json to grafana
 ```
-![image](https://github.com/sevnote/drone_exporter/ras/master/grafana/snapshot.png)
+![image](https://raw.githubusercontent.com/sevnote/drone_exporter/master/grafana/snapshot.png)
